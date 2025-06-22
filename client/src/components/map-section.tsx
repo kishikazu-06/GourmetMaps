@@ -27,53 +27,63 @@ export function MapSection({ onOpenFullMap, className }: MapSectionProps) {
       </CardHeader>
       
       <CardContent>
-        <div className="relative bg-gray-200 rounded-xl h-64 overflow-hidden">
-          {/* Map placeholder - In a real implementation, integrate Google Maps API here */}
-          <img
-            src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600"
-            alt="射水市の地図"
-            className="w-full h-full object-cover"
+        <div className="relative rounded-xl h-64 overflow-hidden">
+          {/* Google Maps Embed - 射水市周辺の地図 */}
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d51904.45289275841!2d137.02051982167966!3d36.78003275000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5ff79d8f1c7a8f1b%3A0x2e7a5d5e8f5e8f5e!2z5bCE5rC05biC44CB5a-M5bGx55yM!5e0!3m2!1sja!2sjp!4v1640995200000!5m2!1sja!2sjp"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="rounded-xl"
+            title="射水市周辺の地図"
           />
           
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-            <div className="text-white text-center">
-              <div className="text-4xl mb-2">🗺️</div>
-              <p className="text-lg font-medium">Google Maps連携</p>
-              <p className="text-sm opacity-90">お店の位置とルート案内</p>
-            </div>
-          </div>
-          
-          {/* Map markers overlay */}
-          <div className="absolute top-4 left-4">
-            <Badge className="bg-primary text-white">
+          {/* Overlay with restaurant markers */}
+          <div className="absolute top-4 left-4 z-10">
+            <Badge className="bg-primary text-white shadow-lg">
               <MapPin className="w-3 h-3 mr-1" />
-              現在地
+              射水市周辺
             </Badge>
           </div>
           
-          <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <Badge 
-              className="bg-secondary text-white hover:scale-110 transition-transform cursor-pointer"
-              onClick={() => {/* Navigate to restaurant */}}
+          <div className="absolute bottom-4 right-4 z-10">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onOpenFullMap}
+              className="bg-white/90 text-gray-800 hover:bg-white shadow-lg"
             >
-              <Utensils className="w-3 h-3 mr-1" />
-              麺屋 射水
-            </Badge>
-          </div>
-          
-          <div className="absolute bottom-1/3 right-1/4">
-            <Badge 
-              className="bg-accent text-gray-800 hover:scale-110 transition-transform cursor-pointer"
-              onClick={() => {/* Navigate to restaurant */}}
-            >
-              <Coffee className="w-3 h-3 mr-1" />
-              カフェ・ド・マルシェ
-            </Badge>
+              <ExternalLink className="w-4 h-4 mr-1" />
+              拡大表示
+            </Button>
           </div>
         </div>
         
-        <div className="mt-4 text-sm text-gray-600">
-          <p>Google Maps APIを使用してリアルタイムの位置情報とルート案内を提供します。</p>
+        <div className="mt-4 space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600">周辺の登録店舗</span>
+            <span className="text-primary font-medium">9店舗</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline" className="text-xs">
+              <Utensils className="w-3 h-3 mr-1" />
+              ラーメン店 2軒
+            </Badge>
+            <Badge variant="outline" className="text-xs">
+              <Coffee className="w-3 h-3 mr-1" />
+              カフェ 1軒
+            </Badge>
+            <Badge variant="outline" className="text-xs">
+              <MapPin className="w-3 h-3 mr-1" />
+              その他 6軒
+            </Badge>
+          </div>
+          <p className="text-xs text-gray-500">
+            地図をタップして各店舗への詳しいルート案内を確認できます
+          </p>
         </div>
       </CardContent>
     </Card>
