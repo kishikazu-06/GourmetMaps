@@ -50,6 +50,7 @@ export default function Home() {
   const { data: bookmarks = [] } = useQuery<RestaurantWithStats[]>({
     queryKey: ["/api/bookmarks"],
     queryFn: async () => {
+      if (!userCookie) return [];
       const response = await fetch("/api/bookmarks", {
         headers: {
           "X-User-Cookie": userCookie,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +47,8 @@ export function ReviewModal({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+
+
   const {
     register,
     handleSubmit,
@@ -65,6 +67,10 @@ export function ReviewModal({
 
   const submitReviewMutation = useMutation({
     mutationFn: async (data: ReviewFormData) => {
+      if (!userCookie) {
+        throw new Error("ユーザークッキーが見つかりません");
+      }
+      
       if (existingReview) {
         return apiRequest("PUT", `/api/reviews/${existingReview.id}`, data, userCookie);
       } else {
@@ -104,10 +110,12 @@ export function ReviewModal({
       return;
     }
 
-    submitReviewMutation.mutate({
+    const reviewData = {
       ...data,
       rating,
-    });
+    };
+    
+    submitReviewMutation.mutate(reviewData);
   };
 
   const handleRatingChange = (newRating: number) => {
@@ -188,7 +196,7 @@ export function ReviewModal({
             </Button>
             <Button 
               type="submit" 
-              disabled={submitReviewMutation.isPending}
+              disabled={submitReviewMutation.isPending || !userCookie}
               className="flex-1 bg-primary text-white hover:bg-primary/90"
             >
               {submitReviewMutation.isPending ? "投稿中..." : existingReview ? "更新する" : "投稿する"}
