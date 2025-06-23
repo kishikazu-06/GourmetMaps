@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,29 @@ export default function RestaurantDetail() {
     },
     enabled: !!restaurantId,
   });
+
+  // ブックマーク状態を確認
+  useEffect(() => {
+    const checkBookmarkStatus = async () => {
+      if (!userCookie || !restaurantId) return;
+      
+      try {
+        const response = await fetch(`/api/bookmarks/${restaurantId}/check`, {
+          headers: {
+            "X-User-Cookie": userCookie,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setIsBookmarked(data.isBookmarked);
+        }
+      } catch (error) {
+        console.error("Failed to check bookmark status:", error);
+      }
+    };
+
+    checkBookmarkStatus();
+  }, [userCookie, restaurantId]);
 
   const { data: userReviews = [] } = useQuery<Review[]>({
     queryKey: ["/api/reviews/user"],
@@ -101,8 +124,8 @@ export default function RestaurantDetail() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: restaurant?.name,
-          text: restaurant?.description,
+          title: restaurant?.name || "",
+          text: restaurant?.description ?? "",
           url: window.location.href,
         });
       } catch (err) {

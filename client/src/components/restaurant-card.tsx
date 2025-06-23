@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,8 +23,35 @@ export function RestaurantCard({ restaurant, variant = "featured", onToggleBookm
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // ユーザークッキーが取得できた時にブックマーク状態を確認
+  useEffect(() => {
+    const checkBookmarkStatus = async () => {
+      if (!userCookie) return;
+      
+      try {
+        const response = await fetch(`/api/bookmarks/${restaurant.id}/check`, {
+          headers: {
+            "X-User-Cookie": userCookie,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setIsBookmarked(data.isBookmarked);
+        }
+      } catch (error) {
+        console.error("Failed to check bookmark status:", error);
+      }
+    };
+
+    checkBookmarkStatus();
+  }, [userCookie, restaurant.id]);
+
   const bookmarkMutation = useMutation({
     mutationFn: async ({ restaurantId, shouldBookmark }: { restaurantId: number; shouldBookmark: boolean }) => {
+      if (!userCookie) {
+        throw new Error("ユーザークッキーが見つかりません");
+      }
+      
       if (shouldBookmark) {
         return apiRequest("POST", "/api/bookmarks", { restaurantId }, userCookie);
       } else {
@@ -41,7 +68,8 @@ export function RestaurantCard({ restaurant, variant = "featured", onToggleBookm
         description: restaurant.name,
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Bookmark error:", error);
       toast({
         title: "エラーが発生しました",
         description: "しばらく経ってから再度お試しください",
