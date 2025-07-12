@@ -36,33 +36,35 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
-  const server = await registerRoutes(app);
-
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
-
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+// Vercelのサーバーレス関数としてエクスポート
+// 開発環境でのみViteのセットアップを行う
+if (process.env.NODE_ENV === "development") {
+  (async () => {
+    const server = await registerRoutes(app);
     await setupVite(app, server);
-  }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = process.env.PORT || 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    
-  }, () => {
-    log(`serving on port ${port}`);
-  });
-})();
+    const port = process.env.PORT || 5000;
+    server.listen({
+      port,
+      host: "0.0.0.0",
+    }, () => {
+      log(`serving on port ${port}`);
+    });
+  })();
+} else {
+  // 本番環境ではExpressアプリを直接エクスポート
+  registerRoutes(app);
+}
+
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+
+  res.status(status).json({ message });
+  // 本番環境ではエラーをスローしない（Vercelが処理するため）
+  if (process.env.NODE_ENV !== "production") {
+    throw err;
+  }
+});
+
+export default app;
