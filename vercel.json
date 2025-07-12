@@ -3,7 +3,7 @@
     {
       "src": "client/index.html",
       "use": "@vercel/static-build",
-      "config": { "distDir": "dist/public" }
+      "config": { "distDir": "client/dist/public" }
     },
     {
       "src": "server/index.ts",
