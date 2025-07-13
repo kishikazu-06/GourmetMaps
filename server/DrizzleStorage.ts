@@ -35,11 +35,17 @@ export class DrizzleStorage implements IStorage {
       },
     });
 
-    return allRestaurants.map(r => ({
-      ...r,
-      reviewCount: r.reviews.length,
-      averageRating: r.reviews.reduce((acc, review) => acc + review.rating, 0) / (r.reviews.length || 1),
-    }));
+    return allRestaurants.map(r => {
+      const reviewCount = r.reviews.length;
+      const averageRating = reviewCount > 0
+        ? r.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount
+        : 0;
+      return {
+        ...r,
+        reviewCount,
+        averageRating: Number(averageRating.toFixed(1)),
+      };
+    });
   }
 
   async getRestaurant(id: number): Promise<RestaurantWithDetails | undefined> {
@@ -113,12 +119,18 @@ export class DrizzleStorage implements IStorage {
       with: { restaurant: { with: { reviews: true } } },
     });
 
-    return userBookmarks.map(b => ({
-      ...b.restaurant,
-      reviewCount: b.restaurant.reviews.length,
-      averageRating: b.restaurant.reviews.reduce((acc, review) => acc + review.rating, 0) / (b.restaurant.reviews.length || 1),
-      isBookmarked: true,
-    }));
+    return userBookmarks.map(b => {
+      const reviewCount = b.restaurant.reviews.length;
+      const averageRating = reviewCount > 0
+        ? b.restaurant.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount
+        : 0;
+      return {
+        ...b.restaurant,
+        reviewCount,
+        averageRating: Number(averageRating.toFixed(1)),
+        isBookmarked: true,
+      };
+    });
   }
 
   async createBookmark(bookmark: InsertBookmark): Promise<Bookmark> {
