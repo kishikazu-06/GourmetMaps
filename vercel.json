@@ -5,7 +5,7 @@
       "use": "@vercel/static-build",
       "config": {
         "buildCommand": "pnpm run build",
-        "outputDirectory": "client/dist/public"
+        "outputDirectory": "dist/public"
       }
     },
     {
