@@ -33,17 +33,15 @@ export class DrizzleStorage implements IStorage {
       with: {
         reviews: true,
       },
-    });
+    }) as (Restaurant & { reviews: Review[] })[];
 
     return allRestaurants.map(r => {
-      // 型アサーションを追加
-      const restaurantWithReviews = r as Restaurant & { reviews: Review[] };
-      const reviewCount = restaurantWithReviews.reviews.length;
+      const reviewCount = r.reviews.length;
       const averageRating = reviewCount > 0
-        ? restaurantWithReviews.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount
+        ? r.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount
         : 0;
       return {
-        ...restaurantWithReviews,
+        ...r,
         reviewCount,
         averageRating: Number(averageRating.toFixed(1)),
       };
@@ -121,15 +119,18 @@ export class DrizzleStorage implements IStorage {
       with: { restaurant: { with: { reviews: true } } },
     });
 
+    const userBookmarks = await db.query.bookmarks.findMany({
+      where: eq(bookmarks.userCookie, userCookie),
+      with: { restaurant: { with: { reviews: true } } },
+    }) as (Bookmark & { restaurant: Restaurant & { reviews: Review[] } })[];
+
     return userBookmarks.map(b => {
-      // 型アサーションを追加
-      const restaurantWithReviews = b.restaurant as Restaurant & { reviews: Review[] };
-      const reviewCount = restaurantWithReviews.reviews.length;
+      const reviewCount = b.restaurant.reviews.length;
       const averageRating = reviewCount > 0
-        ? restaurantWithReviews.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount
+        ? b.restaurant.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount
         : 0;
       return {
-        ...restaurantWithReviews,
+        ...b.restaurant,
         reviewCount,
         averageRating: Number(averageRating.toFixed(1)),
         isBookmarked: true,
