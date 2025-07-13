@@ -38,10 +38,10 @@ export class DrizzleStorage implements IStorage {
     return allRestaurants.map((r: any) => {
       const reviews = r.reviews as any[];
       // @ts-ignore
-      const reviewCount = reviews.length;
+      const reviewCount = (reviews as any).length;
       // @ts-ignore
       const averageRating = reviewCount > 0
-        ? reviews.reduce((acc: any, review: any) => acc + review.rating, 0) / reviewCount
+        ? (reviews as any).reduce((acc: any, review: any) => acc + review.rating, 0) / reviewCount
         : 0;
       return {
         ...r,
@@ -125,10 +125,10 @@ export class DrizzleStorage implements IStorage {
     return userBookmarks.map((b: any) => {
       const reviews = b.restaurant.reviews as any[];
       // @ts-ignore
-      const reviewCount = reviews.length;
+      const reviewCount = (reviews as any).length;
       // @ts-ignore
       const averageRating = reviewCount > 0
-        ? reviews.reduce((acc: any, review: any) => acc + review.rating, 0) / reviewCount
+        ? (reviews as any).reduce((acc: any, review: any) => acc + review.rating, 0) / reviewCount
         : 0;
       return {
         ...b.restaurant,
