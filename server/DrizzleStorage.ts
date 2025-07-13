@@ -59,7 +59,8 @@ export class DrizzleStorage implements IStorage {
       query = query.where(and(...conditions));
     }
 
-    return query;
+    const results = await query;
+    return results.map(r => ({ ...r, isOpen: true }));
   }
 
   async getRestaurant(id: number): Promise<RestaurantWithDetails | undefined> {
@@ -75,7 +76,7 @@ export class DrizzleStorage implements IStorage {
 
     const reviewCount = restaurant.reviews.length;
     const averageRating = reviewCount > 0
-      ? restaurant.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+      ? restaurant.reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviewCount
       : 0;
 
     return {
@@ -159,7 +160,8 @@ export class DrizzleStorage implements IStorage {
     .where(sql`${restaurants.id} IN ${restaurantIds}`)
     .groupBy(restaurants.id, restaurants.name, restaurants.genre, restaurants.address, restaurants.phone, restaurants.description, restaurants.imageUrl, restaurants.latitude, restaurants.longitude, restaurants.hours, restaurants.priceRange, restaurants.features, restaurants.createdAt);
 
-    return restaurantsWithStats;
+    const results = await restaurantsWithStats;
+    return results.map(r => ({ ...r, isOpen: true }));
   }
 
   async createBookmark(bookmark: InsertBookmark): Promise<Bookmark> {

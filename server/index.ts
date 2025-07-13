@@ -1,38 +1,22 @@
-import express from "express";
-import { createServer } from "vite";
-import { registerRoutes } from "./routes";
-import http from "http";
+import express from 'express';
+import { registerRoutes } from './routes';
+import { setupVite } from './vite';
 
-async function startServer() {
-  const app = express();
-  app.use(express.json());
+const app = express();
+app.use(express.json());
 
-  // API routes
-  registerRoutes(app);
+// API routes
+registerRoutes(app);
 
-  if (process.env.NODE_ENV === "development") {
-    const vite = await createServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-      root: "client",
-    });
-    app.use(vite.middlewares);
-  } else {
-    // Vercel will serve static files automatically
-  }
-
-  const server = http.createServer(app);
-  const port = process.env.PORT || 5000;
-
-  if (process.env.NODE_ENV === "development") {
-    server.listen(port, () => {
-      console.log(`Server listening on http://localhost:${port}`);
-    });
-  }
-
-  return app;
+// Vite middleware for development
+if (process.env.NODE_ENV === 'development') {
+  setupVite(app);
+} else {
+  // In production, Vercel handles serving static files.
+  // We might need a placeholder for the root route.
+  app.get('/', (req, res) => {
+    res.send('Server is running.');
+  });
 }
-
-const app = startServer();
 
 export default app;

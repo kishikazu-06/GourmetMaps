@@ -31,7 +31,7 @@ export class MemStorage implements IStorage {
   }
 
   async createRestaurant(restaurant: InsertRestaurant): Promise<Restaurant> {
-    const newRestaurant: Restaurant = { ...restaurant, id: this.nextId++, createdAt: new Date() };
+    const newRestaurant: Restaurant = { ...restaurant, id: this.nextId++, createdAt: new Date(), hours: '', priceRange: '', features: [] };
     this.restaurants.push(newRestaurant);
     return newRestaurant;
   }
