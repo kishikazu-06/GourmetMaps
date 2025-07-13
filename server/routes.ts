@@ -1,10 +1,10 @@
-import { Express } from "express";
+import { Express, Request, Response } from "express";
 import { storage } from "./storage";
 import { insertReviewSchema, insertBookmarkSchema } from "@shared/schema";
 
 export function registerRoutes(app: Express): Express {
   // Restaurant routes
-  app.get("/api/restaurants", async (req, res) => {
+  app.get("/api/restaurants", async (req: Request, res: Response) => {
     try {
       const { genre, search } = req.query;
       const restaurants = await storage.getRestaurants({

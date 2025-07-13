@@ -16,51 +16,30 @@ import {
   type RestaurantWithDetails
 } from "@shared/schema";
 import { IStorage } from "./types";
-import { eq, sql, and, like } from "drizzle-orm";
+import { eq, sql, and, like, inArray } from "drizzle-orm";
 
 export class DrizzleStorage implements IStorage {
   async getRestaurants(filters?: { genre?: string; search?: string }): Promise<RestaurantWithStats[]> {
-    let query = db.select({
-      id: restaurants.id,
-      name: restaurants.name,
-      genre: restaurants.genre,
-      address: restaurants.address,
-      phone: restaurants.phone,
-      description: restaurants.description,
-      imageUrl: restaurants.imageUrl,
-      latitude: restaurants.latitude,
-      longitude: restaurants.longitude,
-      hours: restaurants.hours,
-      priceRange: restaurants.priceRange,
-      features: restaurants.features,
-      createdAt: restaurants.createdAt,
-      averageRating: sql<number>`avg(${reviews.rating})`,
-      reviewCount: sql<number>`count(${reviews.id})`,
-    })
-    .from(restaurants)
-    .leftJoin(reviews, eq(restaurants.id, reviews.restaurantId))
-    .groupBy(restaurants.id, restaurants.name, restaurants.genre, restaurants.address, restaurants.phone, restaurants.description, restaurants.imageUrl, restaurants.latitude, restaurants.longitude, restaurants.hours, restaurants.priceRange, restaurants.features, restaurants.createdAt);
-
     const conditions = [];
     if (filters?.genre && filters.genre !== "all") {
       conditions.push(eq(restaurants.genre, filters.genre));
     }
-
     if (filters?.search) {
-      const searchTerm = `%${filters.search.toLowerCase()}%`;
-      conditions.push(and(
-        like(sql`lower(${restaurants.name})`, searchTerm),
-        like(sql`lower(${restaurants.description})`, searchTerm),
-        like(sql`lower(${restaurants.genre})`, searchTerm)
-      ));
+      conditions.push(like(restaurants.name, `%${filters.search}%`));
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    const allRestaurants = await db.query.restaurants.findMany({
+      where: and(...conditions),
+      with: {
+        reviews: true,
+      },
+    });
 
-    const results = await query;
-    return results.map(r => ({ ...r, isOpen: true }));
+    return allRestaurants.map(r => ({
+      ...r,
+      reviewCount: r.reviews.length,
+      averageRating: r.reviews.reduce((acc, review) => acc + review.rating, 0) / (r.reviews.length || 1),
+    }));
   }
 
   async getRestaurant(id: number): Promise<RestaurantWithDetails | undefined> {
@@ -76,7 +55,7 @@ export class DrizzleStorage implements IStorage {
 
     const reviewCount = restaurant.reviews.length;
     const averageRating = reviewCount > 0
-      ? restaurant.reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviewCount
+      ? restaurant.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
       : 0;
 
     return {
@@ -131,37 +110,15 @@ export class DrizzleStorage implements IStorage {
   async getBookmarksByUser(userCookie: string): Promise<RestaurantWithStats[]> {
     const userBookmarks = await db.query.bookmarks.findMany({
       where: eq(bookmarks.userCookie, userCookie),
+      with: { restaurant: { with: { reviews: true } } },
     });
-    const restaurantIds = userBookmarks.map(b => b.restaurantId);
-    
-    if (restaurantIds.length === 0) {
-      return [];
-    }
 
-    const restaurantsWithStats = await db.select({
-      id: restaurants.id,
-      name: restaurants.name,
-      genre: restaurants.genre,
-      address: restaurants.address,
-      phone: restaurants.phone,
-      description: restaurants.description,
-      imageUrl: restaurants.imageUrl,
-      latitude: restaurants.latitude,
-      longitude: restaurants.longitude,
-      hours: restaurants.hours,
-      priceRange: restaurants.priceRange,
-      features: restaurants.features,
-      createdAt: restaurants.createdAt,
-      averageRating: sql<number>`avg(${reviews.rating})`,
-      reviewCount: sql<number>`count(${reviews.id})`,
-    })
-    .from(restaurants)
-    .leftJoin(reviews, eq(restaurants.id, reviews.restaurantId))
-    .where(sql`${restaurants.id} IN ${restaurantIds}`)
-    .groupBy(restaurants.id, restaurants.name, restaurants.genre, restaurants.address, restaurants.phone, restaurants.description, restaurants.imageUrl, restaurants.latitude, restaurants.longitude, restaurants.hours, restaurants.priceRange, restaurants.features, restaurants.createdAt);
-
-    const results = await restaurantsWithStats;
-    return results.map(r => ({ ...r, isOpen: true }));
+    return userBookmarks.map(b => ({
+      ...b.restaurant,
+      reviewCount: b.restaurant.reviews.length,
+      averageRating: b.restaurant.reviews.reduce((acc, review) => acc + review.rating, 0) / (b.restaurant.reviews.length || 1),
+      isBookmarked: true,
+    }));
   }
 
   async createBookmark(bookmark: InsertBookmark): Promise<Bookmark> {
@@ -197,7 +154,7 @@ export class DrizzleStorage implements IStorage {
 
     return popularItems.map(item => ({
       ...item,
-      restaurantName: item.restaurant?.name || "Unknown Restaurant",
+      restaurantName: item.restaurant.name,
     }));
   }
 
