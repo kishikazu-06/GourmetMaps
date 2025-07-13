@@ -36,12 +36,14 @@ export class DrizzleStorage implements IStorage {
     });
 
     return allRestaurants.map(r => {
-      const reviewCount = r.reviews.length;
+      // 型アサーションを追加
+      const restaurantWithReviews = r as Restaurant & { reviews: Review[] };
+      const reviewCount = restaurantWithReviews.reviews.length;
       const averageRating = reviewCount > 0
-        ? r.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount
+        ? restaurantWithReviews.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount
         : 0;
       return {
-        ...r,
+        ...restaurantWithReviews,
         reviewCount,
         averageRating: Number(averageRating.toFixed(1)),
       };
@@ -120,12 +122,14 @@ export class DrizzleStorage implements IStorage {
     });
 
     return userBookmarks.map(b => {
-      const reviewCount = b.restaurant.reviews.length;
+      // 型アサーションを追加
+      const restaurantWithReviews = b.restaurant as Restaurant & { reviews: Review[] };
+      const reviewCount = restaurantWithReviews.reviews.length;
       const averageRating = reviewCount > 0
-        ? b.restaurant.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount
+        ? restaurantWithReviews.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount
         : 0;
       return {
-        ...b.restaurant,
+        ...restaurantWithReviews,
         reviewCount,
         averageRating: Number(averageRating.toFixed(1)),
         isBookmarked: true,
