@@ -18,9 +18,6 @@
       "src": "/api/(.*)",
       "dest": "server/index.ts"
     },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+    
   ]
 }
