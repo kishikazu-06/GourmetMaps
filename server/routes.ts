@@ -4,7 +4,7 @@ import { insertReviewSchema, insertBookmarkSchema } from "@shared/schema";
 
 export function registerRoutes(app: any): Express {
   // Restaurant routes
-  app.get("/api/restaurants", async (req: Request, res: Response) => {
+  app.get("/api/restaurants", async (req: any, res: any) => {
     try {
       const { genre, search } = req.query;
       const restaurants = await storage.getRestaurants({
@@ -17,7 +17,7 @@ export function registerRoutes(app: any): Express {
     }
   });
 
-  app.get("/api/restaurants/:id", async (req, res) => {
+  app.get("/api/restaurants/:id", async (req: any, res: any) => {
     try {
       const id = parseInt(req.params.id);
       const restaurant = await storage.getRestaurant(id);
@@ -31,7 +31,7 @@ export function registerRoutes(app: any): Express {
   });
 
   // Review routes
-  app.post("/api/reviews", async (req, res) => {
+  app.post("/api/reviews", async (req: any, res: any) => {
     try {
       const userCookie = req.headers['x-user-cookie'] as string;
       if (!userCookie) {
@@ -50,7 +50,7 @@ export function registerRoutes(app: any): Express {
     }
   });
 
-  app.get("/api/reviews/user", async (req, res) => {
+  app.get("/api/reviews/user", async (req: any, res: any) => {
     try {
       const userCookie = req.headers['x-user-cookie'] as string;
       if (!userCookie) {
@@ -64,7 +64,7 @@ export function registerRoutes(app: any): Express {
     }
   });
 
-  app.put("/api/reviews/:id", async (req, res) => {
+  app.put("/api/reviews/:id", async (req: any, res: any) => {
     try {
       const id = parseInt(req.params.id);
       const userCookie = req.headers['x-user-cookie'] as string;
@@ -82,7 +82,7 @@ export function registerRoutes(app: any): Express {
     }
   });
 
-  app.delete("/api/reviews/:id", async (req, res) => {
+  app.delete("/api/reviews/:id", async (req: any, res: any) => {
     try {
       const id = parseInt(req.params.id);
       const userCookie = req.headers['x-user-cookie'] as string;
@@ -101,7 +101,7 @@ export function registerRoutes(app: any): Express {
   });
 
   // Bookmark routes
-  app.get("/api/bookmarks", async (req, res) => {
+  app.get("/api/bookmarks", async (req: any, res: any) => {
     try {
       const userCookie = req.headers['x-user-cookie'] as string;
       if (!userCookie) {
@@ -115,7 +115,7 @@ export function registerRoutes(app: any): Express {
     }
   });
 
-  app.post("/api/bookmarks", async (req, res) => {
+  app.post("/api/bookmarks", async (req: any, res: any) => {
     try {
       const userCookie = req.headers['x-user-cookie'] as string;
       if (!userCookie) {
@@ -134,7 +134,7 @@ export function registerRoutes(app: any): Express {
     }
   });
 
-  app.delete("/api/bookmarks/:restaurantId", async (req, res) => {
+  app.delete("/api/bookmarks/:restaurantId", async (req: any, res: any) => {
     try {
       const restaurantId = parseInt(req.params.restaurantId);
       const userCookie = req.headers['x-user-cookie'] as string;
@@ -149,7 +149,7 @@ export function registerRoutes(app: any): Express {
     }
   });
 
-  app.get("/api/bookmarks/:restaurantId/check", async (req, res) => {
+  app.get("/api/bookmarks/:restaurantId/check", async (req: any, res: any) => {
     try {
       const restaurantId = parseInt(req.params.restaurantId);
       const userCookie = req.headers['x-user-cookie'] as string;
@@ -165,7 +165,7 @@ export function registerRoutes(app: any): Express {
   });
 
   // Menu item routes
-  app.get("/api/menu-items/popular", async (req, res) => {
+  app.get("/api/menu-items/popular", async (req: any, res: any) => {
     try {
       const popularItems = await storage.getPopularMenuItems();
       res.json(popularItems);
@@ -174,7 +174,7 @@ export function registerRoutes(app: any): Express {
     }
   });
 
-  app.get("/api/restaurants/:id/menu-items", async (req, res) => {
+  app.get("/api/restaurants/:id/menu-items", async (req: any, res: any) => {
     try {
       const restaurantId = parseInt(req.params.id);
       const menuItems = await storage.getMenuItemsByRestaurant(restaurantId);
