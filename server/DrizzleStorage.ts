@@ -62,9 +62,10 @@ export class DrizzleStorage implements IStorage {
 
     if (!restaurant) return undefined;
 
-    const reviewCount = restaurant.reviews.length;
+    const reviews = restaurant.reviews as any;
+    const reviewCount = reviews.length;
     const averageRating = reviewCount > 0
-      ? restaurant.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+      ? reviews.reduce((sum: any, r: any) => sum + r.rating, 0) / reviewCount
       : 0;
 
     return {
