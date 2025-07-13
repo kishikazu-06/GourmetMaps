@@ -33,9 +33,9 @@ export class DrizzleStorage implements IStorage {
       with: {
         reviews: true,
       },
-    }) as (Restaurant & { reviews: Review[] })[];
+    }) as any;
 
-    return allRestaurants.map((r: Restaurant & { reviews: Review[] }) => {
+    return allRestaurants.map((r: any) => {
       const reviewCount = r.reviews.length;
       const averageRating = reviewCount > 0
         ? r.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount
@@ -117,9 +117,9 @@ export class DrizzleStorage implements IStorage {
     const userBookmarks = await db.query.bookmarks.findMany({
       where: eq(bookmarks.userCookie, userCookie),
       with: { restaurant: { with: { reviews: true } } },
-    }) as (Bookmark & { restaurant: Restaurant & { reviews: Review[] } })[];
+    }) as any;
 
-    return userBookmarks.map((b: Bookmark & { restaurant: Restaurant & { reviews: Review[] } }) => {
+    return userBookmarks.map((b: any) => {
       const reviewCount = b.restaurant.reviews.length;
       const averageRating = reviewCount > 0
         ? b.restaurant.reviews.reduce((acc, review) => acc + review.rating, 0) / reviewCount

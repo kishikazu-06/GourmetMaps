@@ -2,7 +2,7 @@ import { Express, Request, Response } from "express";
 import { storage } from "./storage";
 import { insertReviewSchema, insertBookmarkSchema } from "@shared/schema";
 
-export function registerRoutes(app: Express): Express {
+export function registerRoutes(app: any): Express {
   // Restaurant routes
   app.get("/api/restaurants", async (req: Request, res: Response) => {
     try {
