@@ -33,7 +33,7 @@ export class DrizzleStorage implements IStorage {
       with: {
         reviews: true,
       },
-    }) as any;
+    }) as any[];
 
     return allRestaurants.map((r: any) => {
       const reviews = r.reviews as any;
@@ -118,7 +118,7 @@ export class DrizzleStorage implements IStorage {
     const userBookmarks = await db.query.bookmarks.findMany({
       where: eq(bookmarks.userCookie, userCookie),
       with: { restaurant: { with: { reviews: true } } },
-    }) as any;
+    }) as any[];
 
     return userBookmarks.map((b: any) => {
       const reviews = b.restaurant.reviews as any;
