@@ -1,5 +1,6 @@
-import { IStorage, MemStorage } from "./storage";
 import { DrizzleStorage } from "./DrizzleStorage";
+import { MemStorage } from "./MemStorage";
+import { IStorage } from "./types";
 
 let storage: IStorage;
 
@@ -9,4 +10,4 @@ if (process.env.NODE_ENV === "production") {
   storage = new MemStorage();
 }
 
-export { storage, IStorage };
+export { storage };

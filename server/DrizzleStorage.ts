@@ -15,7 +15,7 @@ import {
   type RestaurantWithStats,
   type RestaurantWithDetails
 } from "@shared/schema";
-import { IStorage } from "./storage";
+import { IStorage } from "./types";
 import { eq, sql, and, like } from "drizzle-orm";
 
 export class DrizzleStorage implements IStorage {
