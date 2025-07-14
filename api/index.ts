@@ -1,7 +1,9 @@
 import express from 'express';
 import { Express, Request, Response } from "express";
-import { storage } from "../server/storage.js"; // storage.ts は server/storage.ts にあるので、パスを修正する必要がある
-import { insertReviewSchema, insertBookmarkSchema } from "../shared/schema.js"; // @shared/schema.ts は shared/schema.ts にあるので、パスを修正する必要がある
+import { storage } from "../server/storage.js";
+import { insertReviewSchema, insertBookmarkSchema } from "../shared/schema.js";
+
+console.log("API serverless function initialized.");
 
 const app = express();
 
