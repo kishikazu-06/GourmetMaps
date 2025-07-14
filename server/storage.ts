@@ -1,6 +1,6 @@
 //C:\GeminiCLI\TEST\LocalGourmetMaps\server\storage.ts
-import { DrizzleStorage } from "./DrizzleStorage";
-import { MemStorage } from "./MemStorage";
+import { DrizzleStorage } from "./DrizzleStorage.js";
+import { MemStorage } from "./MemStorage.js";
 import { IStorage } from "./types";
 
 let storage: IStorage;
