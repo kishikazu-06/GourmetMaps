@@ -2,6 +2,9 @@ import { db } from "./drizzle.js";
 import { restaurants } from "@shared/schema";
 
 async function seed() {
+  console.log("Deleting existing data...");
+  await db.delete(restaurants);
+
   console.log("Seeding database...");
 
   await db.insert(restaurants).values([
@@ -96,7 +99,7 @@ async function seed() {
       "priceRange": "1000～2000円",
       "features": ["もつ煮込みうどん"]
     }
-  ]).onConflictDoNothing();
+  ]);
 
   console.log("Database seeding complete.");
   process.exit(0);
