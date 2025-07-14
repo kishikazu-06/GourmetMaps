@@ -11,6 +11,7 @@ import { ReviewModal } from "@/components/review-modal";
 import { useUserCookie } from "@/hooks/use-user-cookie";
 import { useToast } from "@/hooks/use-toast";
 import type { RestaurantWithStats } from "@shared/schema";
+import AddRestaurantButton from "@/components/add-restaurant-button";
 
 interface PopularMenuItem {
   id: number;
@@ -361,6 +362,7 @@ export default function Home() {
         >
           <Share2 className="w-5 h-5" />
         </Button>
+        <AddRestaurantButton />
       </div>
 
       {/* Review Modal */}

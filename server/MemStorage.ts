@@ -182,4 +182,17 @@ export class MemStorage implements IStorage {
     const stats = this.getStats(reviews);
     return { ...restaurant, ...stats };
   }
+
+  async createRestaurantWithMenus(data: any): Promise<Restaurant> {
+    const { menus, ...restaurantData } = data;
+    const newRestaurant = await this.createRestaurant(restaurantData);
+
+    if (menus && menus.length > 0) {
+      for (const menu of menus) {
+        await this.createMenuItem({ ...menu, restaurantId: newRestaurant.id });
+      }
+    }
+
+    return newRestaurant;
+  }
 }

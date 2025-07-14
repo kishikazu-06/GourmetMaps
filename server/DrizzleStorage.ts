@@ -191,4 +191,21 @@ export class DrizzleStorage implements IStorage {
     const result = await db.delete(menuItems).where(eq(menuItems.id, id)).returning({ id: menuItems.id });
     return result.length > 0;
   }
+
+  async createRestaurantWithMenus(data: any): Promise<Restaurant> {
+    return db.transaction(async (tx) => {
+      const { menus, ...restaurantData } = data;
+      const [newRestaurant] = await tx.insert(restaurants).values(restaurantData).returning();
+
+      if (menus && menus.length > 0) {
+        const menuItemsToInsert = menus.map((menu: any) => ({
+          ...menu,
+          restaurantId: newRestaurant.id,
+        }));
+        await tx.insert(menuItems).values(menuItemsToInsert);
+      }
+
+      return newRestaurant;
+    });
+  }
 }

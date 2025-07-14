@@ -203,4 +203,20 @@ app.get("/api/restaurants/:id/menu-items", async (req: any, res: any) => {
   }
 });
 
+app.post("/api/restaurants", async (req: any, res: any) => {
+  try {
+    const userCookie = req.headers['x-user-cookie'] as string;
+    if (!userCookie) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const data = req.body;
+    const newRestaurant = await storage.createRestaurantWithMenus(data);
+    res.status(201).json(newRestaurant);
+  } catch (error) {
+    console.error("Error creating restaurant:", error);
+    res.status(400).json({ error: "Invalid restaurant data" });
+  }
+});
+
 export default app;
