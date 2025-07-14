@@ -14,7 +14,7 @@ import {
   type InsertMenuItem,
   type RestaurantWithStats,
   type RestaurantWithDetails
-} from "@shared/schema";
+} from "../shared/schema.js";
 import { IStorage } from "./types";
 import { eq, sql, and, like, inArray } from "drizzle-orm";
 
