@@ -178,6 +178,18 @@ export class DrizzleStorage implements IStorage {
   }
 
   async createMenuItem(menuItem: InsertMenuItem): Promise<MenuItem> {
+    // Check for existing menu item with same name for the same restaurant
+    const existingMenuItem = await db.query.menuItems.findFirst({
+      where: and(
+        eq(menuItems.restaurantId, menuItem.restaurantId),
+        eq(menuItems.name, menuItem.name)
+      ),
+    });
+
+    if (existingMenuItem) {
+      throw new Error("このメニューはすでに登録されています。");
+    }
+
     const [newMenuItem] = await db.insert(menuItems).values(menuItem).returning();
     return newMenuItem;
   }
@@ -195,6 +207,19 @@ export class DrizzleStorage implements IStorage {
   async createRestaurantWithMenus(data: any): Promise<Restaurant> {
     return db.transaction(async (tx) => {
       const { menus, ...restaurantData } = data;
+
+      // Check for existing restaurant with same name and address
+      const existingRestaurant = await tx.query.restaurants.findFirst({
+        where: and(
+          eq(restaurants.name, restaurantData.name),
+          eq(restaurants.address, restaurantData.address)
+        ),
+      });
+
+      if (existingRestaurant) {
+        throw new Error("このお店はすでに登録されています。");
+      }
+
       const [newRestaurant] = await tx.insert(restaurants).values(restaurantData).returning();
 
       if (menus && menus.length > 0) {

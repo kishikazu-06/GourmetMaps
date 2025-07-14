@@ -203,6 +203,23 @@ app.get("/api/restaurants/:id/menu-items", async (req: any, res: any) => {
   }
 });
 
+app.post("/api/restaurants/:id/menu-items", async (req: any, res: any) => {
+  try {
+    const restaurantId = parseInt(req.params.id);
+    const userCookie = req.headers['x-user-cookie'] as string;
+    if (!userCookie) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const menuItemData = { ...req.body, restaurantId };
+    const newMenuItem = await storage.createMenuItem(menuItemData);
+    res.status(201).json(newMenuItem);
+  } catch (error) {
+    console.error("Error adding menu item:", error);
+    res.status(400).json({ error: "Invalid menu item data" });
+  }
+});
+
 app.post("/api/restaurants", async (req: any, res: any) => {
   try {
     const userCookie = req.headers['x-user-cookie'] as string;

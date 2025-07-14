@@ -117,8 +117,14 @@ const RestaurantRegistrationModal = ({ isOpen, onClose }: RestaurantRegistration
       toast({ title: "お店を登録しました！" });
       onClose();
     },
-    onError: () => {
-      toast({ title: "エラー", description: "お店の登録に失敗しました", variant: "destructive" });
+    onError: (error) => {
+      let errorMessage = "お店の登録に失敗しました";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null && 'message' in error) {
+        errorMessage = (error as any).message;
+      }
+      toast({ title: "エラー", description: errorMessage, variant: "destructive" });
     },
   });
 

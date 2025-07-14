@@ -16,8 +16,10 @@ import {
   Edit3,
   Trash2
 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { RatingStars } from "@/components/rating-stars";
 import { ReviewModal } from "@/components/review-modal";
+import { AddMenuModal } from "@/components/add-menu-modal";
 import { useUserCookie } from "@/hooks/use-user-cookie";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -28,6 +30,7 @@ export default function RestaurantDetail() {
   const { id } = useParams<{ id: string }>();
   const restaurantId = parseInt(id || "0");
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showAddMenuModal, setShowAddMenuModal] = useState(false);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
   
@@ -294,12 +297,26 @@ export default function RestaurantDetail() {
         </Card>
 
         {/* Menu Items */}
-        {restaurant.menuItems && restaurant.menuItems.length > 0 && (
-          <Card className="mb-6">
-            <CardHeader>
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
               <CardTitle>メニュー</CardTitle>
-            </CardHeader>
-            <CardContent>
+              <Button
+                onClick={() => setShowAddMenuModal(true)}
+                size="sm"
+                className="bg-secondary text-white hover:bg-secondary/90"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                メニューを追加
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {(!restaurant.menuItems || restaurant.menuItems.length === 0) ? (
+              <div className="text-center py-8 text-gray-500">
+                まだメニューが登録されていません
+              </div>
+            ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {restaurant.menuItems.map((item) => (
                   <div key={item.id} className="flex items-center space-x-3 p-3 border rounded-lg">
@@ -323,9 +340,9 @@ export default function RestaurantDetail() {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+            )}
+          </CardContent>
+        </Card>
 
         {/* Reviews */}
         <Card>
@@ -404,6 +421,14 @@ export default function RestaurantDetail() {
           rating: editingReview.rating,
           comment: editingReview.comment || "",
         } : undefined}
+      />
+
+      {/* Add Menu Modal */}
+      <AddMenuModal
+        isOpen={showAddMenuModal}
+        onClose={() => setShowAddMenuModal(false)}
+        restaurantId={restaurantId}
+        restaurantName={restaurant.name}
       />
     </div>
   );

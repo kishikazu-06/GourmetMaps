@@ -146,6 +146,15 @@ export class MemStorage implements IStorage {
   }
 
   async createMenuItem(data: InsertMenuItem): Promise<MenuItem> {
+    // Check for existing menu item with same name for the same restaurant
+    const existingMenuItem = this.menuItems.find(
+      (m) => m.restaurantId === data.restaurantId && m.name === data.name
+    );
+
+    if (existingMenuItem) {
+      throw new Error("このメニューはすでに登録されています。");
+    }
+
     const newMenuItem: MenuItem = {
       id: this.nextMenuItemId++,
       description: null,
@@ -185,6 +194,16 @@ export class MemStorage implements IStorage {
 
   async createRestaurantWithMenus(data: any): Promise<Restaurant> {
     const { menus, ...restaurantData } = data;
+
+    // Check for existing restaurant with same name and address
+    const existingRestaurant = this.restaurants.find(
+      (r) => r.name === restaurantData.name && r.address === restaurantData.address
+    );
+
+    if (existingRestaurant) {
+      throw new Error("このお店はすでに登録されています。");
+    }
+
     const newRestaurant = await this.createRestaurant(restaurantData);
 
     if (menus && menus.length > 0) {
