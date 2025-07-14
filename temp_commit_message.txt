@@ -1,1 +1,0 @@
-feat: Add seed script to package.json and update Vercel build command
