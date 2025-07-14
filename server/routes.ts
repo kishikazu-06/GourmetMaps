@@ -1,6 +1,6 @@
 import { Express, Request, Response } from "express";
-import { storage } from "./storage";
-import { insertReviewSchema, insertBookmarkSchema } from "@shared/schema";
+import { storage } from "./storage.js";
+import { insertReviewSchema, insertBookmarkSchema } from "@shared/schema.js";
 
 export function registerRoutes(app: any): Express {
   // Restaurant routes
