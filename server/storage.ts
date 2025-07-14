@@ -5,7 +5,7 @@ import { IStorage } from "./types.js";
 
 let storage: IStorage;
 
-if (process.env.NODE_ENV === "production" && false) { // Temporarily disable DrizzleStorage in production
+if (process.env.NODE_ENV === "production") {
   storage = new DrizzleStorage();
 } else {
   storage = new MemStorage();
