@@ -8,6 +8,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 console.log("DATABASE_URL is set. Attempting to create Pool...");
+console.log("Connection String (first 20 chars):", process.env.DATABASE_URL.substring(0, 20));
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 console.log("Pool created. Attempting to initialize Drizzle ORM...");
 

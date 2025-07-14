@@ -20,6 +20,7 @@ app.get("/api/restaurants", async (req: any, res: any) => {
     });
     res.json(restaurants);
   } catch (error) {
+    console.error("Error fetching restaurants:", error);
     res.status(500).json({ error: "Failed to fetch restaurants" });
   }
 });
@@ -33,6 +34,7 @@ app.get("/api/restaurants/:id", async (req: any, res: any) => {
     }
     res.json(restaurant);
   } catch (error) {
+    console.error("Error fetching restaurant by ID:", error);
     res.status(500).json({ error: "Failed to fetch restaurant" });
   }
 });
@@ -53,6 +55,7 @@ app.post("/api/reviews", async (req: any, res: any) => {
     const review = await storage.createReview(reviewData);
     res.json(review);
   } catch (error) {
+    console.error("Error creating review:", error);
     res.status(400).json({ error: "Invalid review data" });
   }
 });
@@ -67,6 +70,7 @@ app.get("/api/reviews/user", async (req: any, res: any) => {
     const reviews = await storage.getReviewsByUser(userCookie);
     res.json(reviews);
   } catch (error) {
+    console.error("Error fetching user reviews:", error);
     res.status(500).json({ error: "Failed to fetch user reviews" });
   }
 });
@@ -85,6 +89,7 @@ app.put("/api/reviews/:id", async (req: any, res: any) => {
     }
     res.json(review);
   } catch (error) {
+    console.error("Error updating review:", error);
     res.status(400).json({ error: "Failed to update review" });
   }
 });
@@ -103,6 +108,7 @@ app.delete("/api/reviews/:id", async (req: any, res: any) => {
     }
     res.json({ success: true });
   } catch (error) {
+    console.error("Error deleting review:", error);
     res.status(500).json({ error: "Failed to delete review" });
   }
 });
@@ -118,6 +124,7 @@ app.get("/api/bookmarks", async (req: any, res: any) => {
     const bookmarks = await storage.getBookmarksByUser(userCookie);
     res.json(bookmarks);
   } catch (error) {
+    console.error("Error fetching bookmarks:", error);
     res.status(500).json({ error: "Failed to fetch bookmarks" });
   }
 });
@@ -137,6 +144,7 @@ app.post("/api/bookmarks", async (req: any, res: any) => {
     const bookmark = await storage.createBookmark(bookmarkData);
     res.json(bookmark);
   } catch (error) {
+    console.error("Error creating bookmark:", error);
     res.status(400).json({ error: "Invalid bookmark data" });
   }
 });
@@ -152,6 +160,7 @@ app.delete("/api/bookmarks/:restaurantId", async (req: any, res: any) => {
     const success = await storage.deleteBookmark(restaurantId, userCookie);
     res.json({ success });
   } catch (error) {
+    console.error("Error deleting bookmark:", error);
     res.status(500).json({ error: "Failed to delete bookmark" });
   }
 });
@@ -167,6 +176,7 @@ app.get("/api/bookmarks/:restaurantId/check", async (req: any, res: any) => {
     const isBookmarked = await storage.isBookmarked(restaurantId, userCookie);
     res.json({ isBookmarked });
   } catch (error) {
+    console.error("Error checking bookmark status:", error);
     res.status(500).json({ error: "Failed to check bookmark status" });
   }
 });
@@ -177,6 +187,7 @@ app.get("/api/menu-items/popular", async (req: any, res: any) => {
     const popularItems = await storage.getPopularMenuItems();
     res.json(popularItems);
   } catch (error) {
+    console.error("Error fetching popular menu items:", error);
     res.status(500).json({ error: "Failed to fetch popular menu items" });
   }
 });
@@ -187,6 +198,7 @@ app.get("/api/restaurants/:id/menu-items", async (req: any, res: any) => {
     const menuItems = await storage.getMenuItemsByRestaurant(restaurantId);
     res.json(menuItems);
   } catch (error) {
+    console.error("Error fetching menu items by restaurant:", error);
     res.status(500).json({ error: "Failed to fetch menu items" });
   }
 });
