@@ -10,7 +10,7 @@ import {
   RestaurantWithStats,
   RestaurantWithDetails
 } from "@shared/schema";
-import { IStorage } from "./types";
+import { IStorage } from "./types.js";
 
 export class MemStorage implements IStorage {
   private restaurants: Restaurant[] = [];

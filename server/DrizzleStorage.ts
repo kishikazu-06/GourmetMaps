@@ -15,7 +15,7 @@ import {
   type RestaurantWithStats,
   type RestaurantWithDetails
 } from "../shared/schema.js";
-import { IStorage } from "./types";
+import { IStorage } from "./types.js";
 import { eq, sql, and, like, inArray } from "drizzle-orm";
 
 export class DrizzleStorage implements IStorage {
