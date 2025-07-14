@@ -1,4 +1,4 @@
-import { drizzle } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/pg-core';
 import { Pool } from 'pg';
 import * as schema from '../shared/schema.js';
 
