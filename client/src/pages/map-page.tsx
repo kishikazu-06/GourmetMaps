@@ -39,6 +39,15 @@ const MapPage: React.FC = () => {
   const [nearestRestaurant, setNearestRestaurant] = useState<RestaurantWithStats | null>(null);
   const mapRef = useRef<L.Map | null>(null);
 
+  // Component to set mapRef after MapContainer is ready
+  const MapRefSetter: React.FC<{ mapRef: React.MutableRefObject<L.Map | null> }> = ({ mapRef }) => {
+    const map = useMap();
+    useEffect(() => {
+      mapRef.current = map;
+    }, [map, mapRef]);
+    return null;
+  };
+
   useEffect(() => {
     // Fetch restaurants
     const fetchRestaurants = async () => {
@@ -111,8 +120,8 @@ const MapPage: React.FC = () => {
           zoom={userLocation ? 15 : 13}
           scrollWheelZoom={true}
           className="h-full w-full z-0"
-          whenReady={(map: L.Map) => { mapRef.current = map; }}
         >
+          <MapRefSetter mapRef={mapRef} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
