@@ -1,6 +1,7 @@
 import express from 'express';
 import { Express, Request, Response } from "express";
 import { storage } from "../server/storage.js";
+console.log("Storage imported.");
 import { insertReviewSchema, insertBookmarkSchema } from "../shared/schema.js";
 
 console.log("API serverless function initialized.");
