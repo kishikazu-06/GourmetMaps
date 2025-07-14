@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { MapPin, LocateFixed } from 'lucide-react';
 
 // Fix for default marker icon issue with Webpack
-delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
@@ -112,7 +111,7 @@ const MapPage: React.FC = () => {
           zoom={userLocation ? 15 : 13}
           scrollWheelZoom={true}
           className="h-full w-full z-0"
-          whenCreated={(map) => { mapRef.current = map; }}
+          whenReady={(map: L.Map) => { mapRef.current = map; }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
