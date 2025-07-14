@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, timestamp, real } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -19,6 +20,12 @@ export const restaurants = pgTable("restaurants", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const restaurantsRelations = relations(restaurants, ({ many }) => ({
+  reviews: many(reviews),
+  bookmarks: many(bookmarks),
+  menuItems: many(menuItems),
+}));
+
 export const reviews = pgTable("reviews", {
   id: serial("id").primaryKey(),
   restaurantId: integer("restaurant_id").references(() => restaurants.id).notNull(),
@@ -29,12 +36,26 @@ export const reviews = pgTable("reviews", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const reviewsRelations = relations(reviews, ({ one }) => ({
+  restaurant: one(restaurants, {
+    fields: [reviews.restaurantId],
+    references: [restaurants.id],
+  }),
+}));
+
 export const bookmarks = pgTable("bookmarks", {
   id: serial("id").primaryKey(),
   restaurantId: integer("restaurant_id").references(() => restaurants.id).notNull(),
   userCookie: text("user_cookie").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
+  restaurant: one(restaurants, {
+    fields: [bookmarks.restaurantId],
+    references: [restaurants.id],
+  }),
+}));
 
 export const menuItems = pgTable("menu_items", {
   id: serial("id").primaryKey(),
@@ -45,6 +66,13 @@ export const menuItems = pgTable("menu_items", {
   imageUrl: text("image_url"),
   isPopular: boolean("is_popular").default(false),
 });
+
+export const menuItemsRelations = relations(menuItems, ({ one }) => ({
+  restaurant: one(restaurants, {
+    fields: [menuItems.restaurantId],
+    references: [restaurants.id],
+  }),
+}));
 
 export const insertRestaurantSchema = createInsertSchema(restaurants).omit({
   id: true,
