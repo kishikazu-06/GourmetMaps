@@ -1,4 +1,4 @@
-import { db } from "./drizzle";
+import { db } from "./drizzle.js";
 import { 
   restaurants, 
   reviews, 
