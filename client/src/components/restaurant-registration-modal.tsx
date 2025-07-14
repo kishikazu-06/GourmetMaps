@@ -10,6 +10,10 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { PlusCircle, XCircle } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUserCookie } from "@/hooks/use-user-cookie";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 // Marker icon fix
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -80,26 +84,9 @@ const RestaurantRegistrationModal = ({ isOpen, onClose }: RestaurantRegistration
     control: form.control,
     name: "menus",
   });
-
-  import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUserCookie } from "@/hooks/use-user-cookie";
-import { useToast } from "@/hooks/use-toast";
-
-// ... (imports)
-
-const RestaurantRegistrationModal = ({ isOpen, onClose }: RestaurantRegistrationModalProps) => {
   const queryClient = useQueryClient();
   const userCookie = useUserCookie();
   const { toast } = useToast();
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    // ... (form setup)
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "menus",
-  });
 
   const mutation = useMutation({
     mutationFn: (newRestaurant: z.infer<typeof formSchema>) => {
@@ -131,9 +118,6 @@ const RestaurantRegistrationModal = ({ isOpen, onClose }: RestaurantRegistration
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     mutation.mutate(values);
   };
-
-  // ... (return statement with form)
-};
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

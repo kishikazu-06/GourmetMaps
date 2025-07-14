@@ -19,7 +19,7 @@ import {
 import { Plus } from "lucide-react";
 import { RatingStars } from "@/components/rating-stars";
 import { ReviewModal } from "@/components/review-modal";
-import { AddMenuModal } from "@/components/add-menu-modal";
+import AddMenuModal from "@/components/add-menu-modal";
 import { useUserCookie } from "@/hooks/use-user-cookie";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
