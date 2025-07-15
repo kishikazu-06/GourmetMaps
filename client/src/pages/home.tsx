@@ -302,13 +302,12 @@ export default function Home() {
   );
 }
 
-const handleGetLocation = () => {
-  toast({
-    title: "位置情報を取得中...",
-    description: "現在地周辺のお店を検索しています",
-  });
-};
-      />
+  const handleGetLocation = () => {
+    toast({
+      title: "位置情報を取得中...",
+      description: "現在地周辺のお店を検索しています",
+    });
+  };
 
       {/* Quick Stats */}
       <div className="bg-gradient-to-r from-primary to-accent py-6">
