@@ -26,6 +26,7 @@ L.Icon.Default.mergeOptions({
 const menuSchema = z.object({
   name: z.string().min(1, "メニュー名は必須です"),
   price: z.coerce.number().min(0, "価格は0以上で入力してください").optional(),
+  imageUrl: z.any().optional(),
 });
 
 const formSchema = z.object({
@@ -36,7 +37,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   hours: z.string().optional(),
   priceRange: z.string().optional(),
-  imageUrl: z.string().url("無効なURLです").optional().or(z.literal('')),
+  restaurantImage: z.any().optional(), // For file input
   latitude: z.number(),
   longitude: z.number(),
   menus: z.array(menuSchema).optional(),
@@ -89,14 +90,36 @@ const RestaurantRegistrationModal = ({ isOpen, onClose }: RestaurantRegistration
   const { toast } = useToast();
 
   const mutation = useMutation({
-    mutationFn: (newRestaurant: z.infer<typeof formSchema>) => {
+    mutationFn: async (newRestaurant: z.infer<typeof formSchema>) => {
+      const formData = new FormData();
+      formData.append("name", newRestaurant.name);
+      formData.append("genre", newRestaurant.genre);
+      if (newRestaurant.address) formData.append("address", newRestaurant.address);
+      if (newRestaurant.phone) formData.append("phone", newRestaurant.phone);
+      if (newRestaurant.description) formData.append("description", newRestaurant.description);
+      if (newRestaurant.hours) formData.append("hours", newRestaurant.hours);
+      if (newRestaurant.priceRange) formData.append("priceRange", newRestaurant.priceRange);
+      formData.append("latitude", newRestaurant.latitude.toString());
+      formData.append("longitude", newRestaurant.longitude.toString());
+
+      if (newRestaurant.restaurantImage) {
+        formData.append("restaurantImage", newRestaurant.restaurantImage);
+      }
+
+      newRestaurant.menus?.forEach((menu, index) => {
+        formData.append(`menus[${index}].name`, menu.name);
+        if (menu.price) formData.append(`menus[${index}].price`, menu.price.toString());
+        if (menu.imageUrl) {
+          formData.append(`menus[${index}].imageUrl`, menu.imageUrl);
+        }
+      });
+
       return fetch("/api/restaurants", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           "X-User-Cookie": userCookie || "",
         },
-        body: JSON.stringify(newRestaurant),
+        body: formData,
       });
     },
     onSuccess: () => {
@@ -168,6 +191,24 @@ const RestaurantRegistrationModal = ({ isOpen, onClose }: RestaurantRegistration
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="restaurantImage"
+                  render={({ field: { value, onChange, ...fieldProps } }) => (
+                    <FormItem>
+                      <FormLabel>店舗画像</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...fieldProps}
+                          type="file"
+                          accept="image/*"
+                          onChange={(event) => onChange(event.target.files && event.target.files[0])}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               <div>
                 <FormLabel>場所を選択</FormLabel>
@@ -210,6 +251,24 @@ const RestaurantRegistrationModal = ({ isOpen, onClose }: RestaurantRegistration
                         <FormItem>
                           <FormControl>
                             <Input type="number" placeholder="価格" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`menus.${index}.imageUrl`}
+                      render={({ field: { value, onChange, ...fieldProps } }) => (
+                        <FormItem>
+                          <FormLabel>メニュー画像</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...fieldProps}
+                              type="file"
+                              accept="image/*"
+                              onChange={(event) => onChange(event.target.files && event.target.files[0])}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

@@ -9,10 +9,11 @@ const AddRestaurantButton = () => {
   return (
     <>
       <Button
-        className="fixed bottom-20 right-4 h-16 w-16 rounded-full shadow-lg"
+        className="h-12 px-4 py-2 rounded-full shadow-lg flex items-center space-x-2"
         onClick={() => setIsModalOpen(true)}
       >
-        <Plus className="h-8 w-8" />
+        <Plus className="h-5 w-5" />
+        <span>店舗を登録</span>
       </Button>
       <RestaurantRegistrationModal
         isOpen={isModalOpen}

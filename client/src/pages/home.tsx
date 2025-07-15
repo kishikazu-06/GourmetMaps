@@ -2,13 +2,10 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Heart, MapPin, Share2, Edit3, User } from "lucide-react";
+import { MapPin, Share2, Edit3, User } from "lucide-react";
 import { SearchBar } from "@/components/search-bar";
 import { RestaurantCard } from "@/components/restaurant-card";
 import { MapSection } from "@/components/map-section";
-import { ReviewModal } from "@/components/review-modal";
-import { useUserCookie } from "@/hooks/use-user-cookie";
 import { useToast } from "@/hooks/use-toast";
 import type { RestaurantWithStats } from "@shared/schema";
 import AddRestaurantButton from "@/components/add-restaurant-button";
@@ -24,11 +21,6 @@ interface PopularMenuItem {
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentFilter, setCurrentFilter] = useState("all");
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [selectedRestaurant, setSelectedRestaurant] = useState<{ id: number; name: string } | null>(null);
-  const [bookmarkCount, setBookmarkCount] = useState(0);
-  
-  const userCookie = useUserCookie();
   const { toast } = useToast();
 
   const { data: restaurants = [], isLoading: loadingRestaurants } = useQuery<RestaurantWithStats[]>({
@@ -66,7 +58,6 @@ export default function Home() {
   const featuredRestaurants = restaurants.slice(0, 3);
   const stats = {
     totalRestaurants: restaurants.length,
-    totalReviews: restaurants.reduce((sum, r) => sum + r.reviewCount, 0),
     nearbyCount: restaurants.length,
   };
 
@@ -106,20 +97,6 @@ export default function Home() {
     }
   };
 
-  const handleOpenReviewModal = () => {
-    if (featuredRestaurants.length > 0) {
-      setSelectedRestaurant({
-        id: featuredRestaurants[0].id,
-        name: featuredRestaurants[0].name,
-      });
-      setShowReviewModal(true);
-    }
-  };
-
-  const handleBookmarkToggle = (restaurantId: number, isBookmarked: boolean) => {
-    setBookmarkCount(prev => isBookmarked ? prev + 1 : prev - 1);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header - Mobile only, hidden on desktop */}
@@ -136,18 +113,6 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="relative p-2 text-gray-600 hover:text-primary"
-              >
-                <Heart className="w-5 h-5" />
-                {bookmarks.length > 0 && (
-                  <Badge className="absolute -top-1 -right-1 bg-danger text-white text-xs w-5 h-5 rounded-full flex items-center justify-center p-0">
-                    {bookmarks.length}
-                  </Badge>
-                )}
-              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -169,23 +134,11 @@ export default function Home() {
               <p className="text-sm text-gray-600">射水市の美味しいお店を発見しよう</p>
             </div>
             <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <span>登録店舗:</span>
                 <span className="font-semibold text-primary">{stats.totalRestaurants}店舗</span>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="relative text-gray-600 hover:text-primary"
-              >
-                <Heart className="w-5 h-5 mr-2" />
-                <span>お気に入り</span>
-                {bookmarks.length > 0 && (
-                  <Badge className="ml-2 bg-danger text-white text-xs">
-                    {bookmarks.length}
-                  </Badge>
-                )}
-              </Button>
             </div>
           </div>
         </div>
@@ -196,7 +149,7 @@ export default function Home() {
         onSearch={handleSearch}
         onFilterChange={handleFilterChange}
         currentFilter={currentFilter}
-        onToggleMap={() => {}}
+        onToggleMap={() => {}
         onGetLocation={() => {
           toast({
             title: "位置情報を取得中...",
@@ -212,10 +165,6 @@ export default function Home() {
             <div>
               <div className="text-2xl font-bold">{stats.totalRestaurants}</div>
               <div className="text-sm opacity-90">登録店舗</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold">{stats.totalReviews}</div>
-              <div className="text-sm opacity-90">レビュー数</div>
             </div>
             <div>
               <div className="text-2xl font-bold">{stats.nearbyCount}</div>
@@ -259,7 +208,6 @@ export default function Home() {
                       key={restaurant.id}
                       restaurant={restaurant}
                       variant="featured"
-                      onToggleBookmark={handleBookmarkToggle}
                     />
                   ))}
                 </div>
@@ -284,7 +232,6 @@ export default function Home() {
                     key={restaurant.id}
                     restaurant={restaurant}
                     variant="list"
-                    onToggleBookmark={handleBookmarkToggle}
                   />
                 ))}
               </div>
@@ -349,13 +296,6 @@ export default function Home() {
       {/* Floating Action Buttons */}
       <div className="fixed bottom-20 right-6 flex flex-col space-y-3 z-30 md:bottom-6">
         <Button
-          onClick={handleOpenReviewModal}
-          className="w-12 h-12 bg-secondary text-white rounded-full shadow-lg hover:shadow-xl transition-shadow p-0"
-          title="レビューを書く"
-        >
-          <Edit3 className="w-5 h-5" />
-        </Button>
-        <Button
           onClick={handleShareApp}
           className="w-12 h-12 bg-primary text-white rounded-full shadow-lg hover:shadow-xl transition-shadow p-0"
           title="アプリをシェア"
@@ -364,16 +304,6 @@ export default function Home() {
         </Button>
         <AddRestaurantButton />
       </div>
-
-      {/* Review Modal */}
-      {selectedRestaurant && (
-        <ReviewModal
-          isOpen={showReviewModal}
-          onClose={() => setShowReviewModal(false)}
-          restaurantId={selectedRestaurant.id}
-          restaurantName={selectedRestaurant.name}
-        />
-      )}
     </div>
   );
 }
