@@ -43,6 +43,7 @@ export default function Home() {
   const { data: bookmarks = [] } = useQuery<RestaurantWithStats[]>({
     queryKey: ["/api/bookmarks"],
     queryFn: async () => {
+      const userCookie = document.cookie.split('; ').find(row => row.startsWith('userCookie='))?.split('=')[1];
       if (!userCookie) return [];
       const response = await fetch("/api/bookmarks", {
         headers: {
@@ -52,7 +53,7 @@ export default function Home() {
       if (!response.ok) throw new Error("Failed to fetch bookmarks");
       return response.json();
     },
-    enabled: !!userCookie,
+    enabled: !!document.cookie.split('; ').find(row => row.startsWith('userCookie=')),
   });
 
   const featuredRestaurants = restaurants.slice(0, 3);
@@ -67,6 +68,22 @@ export default function Home() {
 
   const handleFilterChange = (genre: string) => {
     setCurrentFilter(genre);
+  };
+
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log("Latitude:", position.coords.latitude);
+          console.log("Longitude:", position.coords.longitude);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
   };
 
   const handleShareApp = async () => {
@@ -298,9 +315,153 @@ export default function Home() {
         </Button>
         <AddRestaurantButton />
       </div>
+
+      {/* Quick Stats */}
+      <div className="bg-gradient-to-r from-primary to-accent py-6">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-3 gap-4 text-center text-white">
+            <div>
+              <div className="text-2xl font-bold">{stats.totalRestaurants}</div>
+              <div className="text-sm opacity-90">登録店舗</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{stats.nearbyCount}</div>
+              <div className="text-sm opacity-90">周辺店舗</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <main className="container mx-auto px-4 md:px-6 py-6">
+        {/* Desktop Layout Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content - Left Column */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Featured Section */}
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-800">今週の推しグルメ</h2>
+                <Button variant="ghost" className="text-primary hover:text-primary/80 text-sm font-medium">
+                  もっと見る
+                </Button>
+              </div>
+              
+              {loadingRestaurants ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[...Array(3)].map((_, i) => (
+                    <Card key={i} className="animate-pulse">
+                      <div className="h-48 bg-gray-300"></div>
+                      <CardContent className="p-4">
+                        <div className="h-4 bg-gray-300 rounded mb-2"></div>
+                        <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+                        <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {featuredRestaurants.map((restaurant) => (
+                    <RestaurantCard
+                      key={restaurant.id}
+                      restaurant={restaurant}
+                      variant="featured"
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Restaurant List */}
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-gray-800">周辺のお店</h2>
+                <select className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-primary focus:border-transparent">
+                  <option value="distance">距離順</option>
+                  <option value="rating">評価順</option>
+                  <option value="popular">人気順</option>
+                  <option value="newest">新着順</option>
+                </select>
+              </div>
+
+              <div className="space-y-4">
+                {restaurants.map((restaurant) => (
+                  <RestaurantCard
+                    key={restaurant.id}
+                    restaurant={restaurant}
+                    variant="list"
+                  />
+                ))}
+              </div>
+
+              <div className="flex justify-center mt-6">
+                <Button variant="outline" className="px-6 py-3">
+                  もっと読み込む
+                </Button>
+              </div>
+            </section>
+          </div>
+
+          {/* Sidebar - Right Column */}
+          <div className="space-y-6">
+            {/* Map Section */}
+            <MapSection />
+
+            {/* Popular Menu Section */}
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-gray-800">人気の推しメニュー</h2>
+                <Button variant="ghost" className="text-primary hover:text-primary/80 text-sm font-medium">
+                  ランキング
+                </Button>
+              </div>
+              
+              <div className="space-y-3">
+                {popularMenus.slice(0, 4).map((menu) => (
+                  <Card key={menu.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                    <CardContent className="p-3">
+                      <div className="flex space-x-3">
+                        <img
+                          src={menu.imageUrl || "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=80"}
+                          alt={menu.name}
+                          className="w-16 h-12 object-cover rounded-lg flex-shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm text-gray-800 mb-1 truncate">
+                            {menu.name}
+                          </h4>
+                          <p className="text-xs text-gray-500 mb-1 truncate">
+                            {menu.restaurantName}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-primary font-bold text-sm">¥{menu.price}</span>
+                            <div className="flex items-center space-x-1">
+                              <span className="text-accent">★</span>
+                              <span className="text-xs text-gray-600">4.{Math.floor(Math.random() * 9) + 1}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-20 right-6 flex flex-col space-y-3 z-30 md:bottom-6">
+        <Button
+          onClick={handleShareApp}
+          className="w-12 h-12 bg-primary text-white rounded-full shadow-lg hover:shadow-xl transition-shadow p-0"
+          title="アプリをシェア"
+        >
+          <Share2 className="w-5 h-5" />
+        </Button>
+        <AddRestaurantButton />
+      </div>
     </div>
   );
-}
-
-  
 }

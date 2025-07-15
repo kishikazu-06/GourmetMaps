@@ -1,0 +1,1 @@
+Fix: Remove duplicate JSX and handle X-User-Cookie header
